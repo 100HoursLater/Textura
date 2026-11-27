@@ -4,7 +4,7 @@
   - ; subcat operator
   \ \ ; literal regexp
   * ; prefix: add space, suffix: remove space, infix: nothing
-  / ; splice operator, cuts the string in half
+  / ; split operator, cuts the string in half
   | ; pipe/seperator, all it does is visual seperate two params
   or ; logical OR
   and ; logical AND
