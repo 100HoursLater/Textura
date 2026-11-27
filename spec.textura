@@ -1,0 +1,75 @@
+[spec]:
+ [operators]: 
+  + ; concat operator
+  - ; subcat operator
+  \ \ ; literal regexp
+  * ; prefix: add space, suffix: remove space, infix: nothing
+  / ; splice operator
+  | ; pipe/seperator
+  or ; logical OR
+  and ; logical AND
+  ? ; suffix: conditional, prefix: nothing, infix: nothing
+  ${} ; regexp injector (for variables to inject them into regexp)
+  = ; assignment
+  end_tag.
+
+  [variables]:
+   r = inbound(->'data here'). ; this is inbound data, from say a SQL or JSON or INI file
+   f = native(->"string here"). ; this is native data, it was made inside of the file
+   o = ?. ; boolean/conditional
+  end_tag.
+
+  [lists]: 
+  {
+    ; lists must be inside of an object and it must have the word list somewhere in the name
+    [myList]:
+     ; text here
+    end_list.
+  }.
+
+  {
+    ; this is a literal object, it lacks the above tag
+  }.
+  end_tag.
+
+  [tags]:
+   ; tags the above type with the pattern: [word(s)here] 
+  end_tag.
+
+  {(instruction): 
+   [ ; instructions must be used inside of an object literal
+     r.[\a-zA-Z0-9\idc|g].
+     r+f. 
+     match(r = ("yes")or("no")).outbound(->send{return r.inbound}).
+   ]
+   (end_instruction).
+
+   ; now lets say the data is not inbound, but rather native we can't just return it back to the inbound line which sends it back to the originating file
+   ; we use the 3 goats method
+
+   goat:
+   {(instruction):
+     this.format("JSON".fmt[f | \"${f}"\]).outbound(->{return f}).
+    (end_instruction).
+   }.
+   end_goat.
+
+   goat: 
+   {(instruction): 
+     this.validation(f).fail? {return fail}.
+     this.validation(f).success? {return success}.
+    (end_instruction).
+   }.
+   end_goat.
+
+   goat:
+   {(instruction):
+     this.march(send(f | {instruct:{"LOCAL"}}).outbound(->{file<fpath("MACHINE_PATH : path here")>})).
+    (end_instruction).
+   }.
+   end_goat.
+
+  }.
+end_tag
+ 
+
